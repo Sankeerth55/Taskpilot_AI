@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskPilot Extension Test Page</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #22c55e;
+        }
+        .test-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            background: #22c55e;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        button:hover {
+            background: #16a34a;
+        }
+        button.secondary {
+            background: #3b82f6;
+        }
+        button.secondary:hover {
+            background: #2563eb;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #22c55e;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 6px;
+            background: #f3f4f6;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success { background: #d1fae5; color: #065f46; }
+        .error { background: #fee2e2; color: #991b1b; }
+        .info { background: #dbeafe; color: #1e40af; }
+        .clickable-elements {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 TaskPilot Extension Test Page</h1>
+    <p>Use this page to test the TaskPilot browser extension and screen interaction features.</p>
+
+    <!-- Test Section 1: Extension Status -->
+    <div class="test-section">
+        <h2>1. Extension Status</h2>
+        <div class="test-controls">
+            <button onclick="testExtensionLoaded()">Check Extension</button>
+            <button onclick="startScreenShare()">Start Screen Share</button>
+            <button onclick="stopScreenShare()">Stop Screen Share</button>
+        </div>
+        <div id="extension-status" class="status">Extension status: Unknown</div>
+    </div>
+
+    <!-- Test Section 2: Click Actions -->
+    <div class="test-section">
+        <h2>2. Click Actions</h2>
+        <p>Try: "Click Submit" or "Click Cancel"</p>
+        <div class="clickable-elements">
+            <button id="test-submit" onclick="handleClick('Submit')">Submit Form</button>
+            <button class="secondary" id="test-cancel" onclick="handleClick('Cancel')">Cancel</button>
+            <button class="secondary" onclick="handleClick('Refresh')">Refresh Page</button>
+        </div>
+        <div class="test-controls">
+            <button onclick="testClick('Submit')">Test Click "Submit"</button>
+            <button onclick="testClick('Cancel')">Test Click "Cancel"</button>
+        </div>
+        <div id="click-status" class="status">No clicks yet</div>
+    </div>
+
+    <!-- Test Section 3: Type Actions -->
+    <div class="test-section">
+        <h2>3. Type Actions</h2>
+        <p>Click in a field, then try: "Type hello world"</p>
+        <label for="test-input">Email Address:</label>
+        <input type="email" id="test-input" placeholder="test@example.com">
+        
+        <label for="test-textarea">Message:</label>
+        <textarea id="test-textarea" rows="3" placeholder="Enter your message here..."></textarea>
+        
+        <div class="test-controls">
+            <button onclick="testType('Hello TaskPilot!')">Test Type</button>
+            <button onclick="testFocus('email')">Test Focus Email</button>
+        </div>
+        <div id="type-status" class="status">No typing yet</div>
+    </div>
+
+    <!-- Test Section 4: Scroll Actions -->
+    <div class="test-section">
+        <h2>4. Scroll Actions</h2>
+        <p>Try: "Scroll down" or "Scroll up"</p>
+        <div class="test-controls">
+            <button onclick="testScroll('down')">Test Scroll Down</button>
+            <button onclick="testScroll('up')">Test Scroll Up</button>
+        </div>
+        <div id="scroll-status" class="status">No scrolling yet</div>
+        
+        <!-- Padding to make scrolling visible -->
+        <div style="height: 1000px; background: linear-gradient(to bottom, #fff 0%, #f0f0f0 100%); padding: 20px; margin-top: 20px; border-radius: 6px;">
+            <p>📜 Scroll content area - Try scrolling commands!</p>
+            <p>Line 1</p>
+            <p>Line 2</p>
+            <p>Line 3</p>
+            <p>Line 4</p>
+            <p>Line 5</p>
+        </div>
+    </div>
+
+    <!-- Test Section 5: Read Actions -->
+    <div class="test-section">
+        <h2>5. Read Actions</h2>
+        <p>Try: "What's on this page?" or "Read the content"</p>
+        <div class="test-controls">
+            <button onclick="testRead()">Test Read Page</button>
+        </div>
+        <div id="read-status" class="status">No reading yet</div>
+    </div>
+
+    <!-- Test Section 6: Message Log -->
+    <div class="test-section">
+        <h2>6. Message Log</h2>
+        <div id="message-log" class="status" style="max-height: 200px; overflow-y: auto;">
+            Waiting for messages...
+        </div>
+        <button onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <script>
+        const messageLog = [];
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            messageLog.push({ time: timestamp, message, type });
+            
+            const logDiv = document.getElementById('message-log');
+            logDiv.innerHTML = messageLog.map(m => 
+                `<div class="${m.type}">[${m.time}] ${m.message}</div>`
+            ).join('');
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function clearLog() {
+            messageLog.length = 0;
+            document.getElementById('message-log').innerHTML = 'Log cleared';
+        }
+
+        // Listen for extension messages
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'TASKPILOT_ACTION_RESPONSE') {
+                log(`Extension response: ${JSON.stringify(event.data)}`, 'success');
+            }
+        });
+
+        function sendAction(action, data, messageId = `test_${Date.now()}`) {
+            log(`Sending action: ${action}`, 'info');
+            window.postMessage({
+                type: 'TASKPILOT_ACTION',
+                messageId: messageId,
+                payload: { action, ...data }
+            }, '*');
+        }
+
+        function testExtensionLoaded() {
+            const overlay = document.getElementById('taskpilot-overlay');
+            const status = document.getElementById('extension-status');
+            
+            if (overlay) {
+                status.className = 'status success';
+                status.textContent = '✅ Extension loaded! Content script is active.';
+                log('Extension is loaded and ready', 'success');
+            } else {
+                status.className = 'status error';
+                status.textContent = '❌ Extension not detected. Please install and refresh.';
+                log('Extension not found', 'error');
+            }
+        }
+
+        function startScreenShare() {
+            log('Triggering START_SHARING...', 'info');
+            window.postMessage({ type: 'START_SHARING', mode: 'tab' }, '*');
+            
+            setTimeout(() => {
+                const overlay = document.getElementById('taskpilot-overlay');
+                if (overlay && overlay.style.display === 'block') {
+                    log('✅ Screen sharing started - green border should be visible', 'success');
+                } else {
+                    log('⚠️ Border not visible yet - extension may need activation', 'error');
+                }
+            }, 500);
+        }
+
+        function stopScreenShare() {
+            log('Triggering STOP_SHARING...', 'info');
+            window.postMessage({ type: 'STOP_SHARING' }, '*');
+            log('Screen sharing stopped', 'success');
+        }
+
+        function testClick(target) {
+            sendAction('click', { target });
+            document.getElementById('click-status').textContent = `Attempting to click: ${target}`;
+        }
+
+        function testType(text) {
+            sendAction('type_text', { text });
+            document.getElementById('type-status').textContent = `Typing: ${text}`;
+        }
+
+        function testFocus(target) {
+            sendAction('focus_element', { target });
+            document.getElementById('type-status').textContent = `Focusing: ${target}`;
+        }
+
+        function testScroll(direction) {
+            sendAction('scroll', { direction, amount: 300 });
+            document.getElementById('scroll-status').textContent = `Scrolling ${direction}...`;
+        }
+
+        function testRead() {
+            const messageId = `read_${Date.now()}`;
+            sendAction('read', {}, messageId);
+            document.getElementById('read-status').textContent = 'Reading page...';
+            
+            // Listen for response
+            const handler = (event) => {
+                if (event.data.type === 'TASKPILOT_ACTION_RESPONSE' && 
+                    event.data.messageId === messageId) {
+                    window.removeEventListener('message', handler);
+                    const text = event.data.data?.text || 'No text returned';
+                    document.getElementById('read-status').textContent = 
+                        `Read ${text.length} characters: ${text.substring(0, 100)}...`;
+                    log(`Read page: ${text.length} chars`, 'success');
+                }
+            };
+            window.addEventListener('message', handler);
+        }
+
+        function handleClick(button) {
+            log(`Button clicked: ${button}`, 'success');
+            document.getElementById('click-status').className = 'status success';
+            document.getElementById('click-status').textContent = `✅ ${button} button was clicked!`;
+        }
+
+        // Auto-check on load
+        setTimeout(testExtensionLoaded, 500);
+    </script>
+</body>
+</html>

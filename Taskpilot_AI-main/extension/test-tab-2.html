@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Tab 2 - TaskPilot</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 40px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            color: #333;
+        }
+        .page-number {
+            font-size: 48px;
+            font-weight: bold;
+            color: #f5576c;
+            margin: 20px 0;
+        }
+        h1 {
+            color: #f093fb;
+        }
+        .instruction {
+            background: #fff5f8;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #f5576c;
+        }
+        button {
+            padding: 12px 24px;
+            background: #f5576c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #e04b5f;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+        }
+        .highlight-box {
+            background: #22c55e;
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-number">📄 Page 2</div>
+        <h1>Tab Switching Test - Page 2</h1>
+        
+        <div class="highlight-box">
+            ✅ If you see the GREEN BORDER on THIS page,<br>
+            the tab-following feature is working correctly!
+        </div>
+
+        <div class="instruction">
+            <h3>🎯 What to Check:</h3>
+            <ul>
+                <li>✅ Green border should be visible on THIS tab</li>
+                <li>✅ Border should have disappeared from Tab 1</li>
+                <li>✅ Badge should say "TaskPilot Controlling: Entire Screen"</li>
+                <li>✅ When you switch back to Tab 1, border moves there</li>
+            </ul>
+        </div>
+
+        <h3>Test Actions on THIS Tab</h3>
+        <p>Try these commands while on THIS page:</p>
+        
+        <button onclick="testAction('scroll', {direction: 'down', amount: 400})">⬇️ Scroll Down</button>
+        <button onclick="testAction('click', {target: 'submit'})">🖱️ Click Submit</button>
+        <button onclick="focusAndType()">⌨️ Type in Field</button>
+
+        <input type="text" id="test-input-2" placeholder="Test typing here (try: 'Type hello')">
+
+        <div style="height: 800px; background: linear-gradient(to bottom, #fff 0%, #fff5f8 100%); padding: 20px; margin-top: 20px; border-radius: 8px;">
+            <h3>📜 Scrollable Content - Page 2</h3>
+            <p><strong>What you're testing:</strong></p>
+            <p>1️⃣ The green border follows the active tab</p>
+            <p>2️⃣ Actions work on whichever tab is visible</p>
+            <p>3️⃣ You can control multiple tabs by switching between them</p>
+            <p>4️⃣ This is exactly how Google Meet screen sharing works</p>
+            <br>
+            <p><strong>Expected Behavior:</strong></p>
+            <p>✅ Border appears when this tab is active</p>
+            <p>✅ Border disappears when you switch away</p>
+            <p>✅ Voice commands work on the visible tab</p>
+            <p>✅ Gemini AI sees what's on the active tab</p>
+            <br>
+            <p><strong>Try Now:</strong></p>
+            <p>1. Switch back to Tab 1 - border should move there</p>
+            <p>2. Switch back here - border returns</p>
+            <p>3. Give a voice command - it works on THIS page</p>
+            <br>
+            <button id="page2-submit" style="width: auto;">Submit Form</button>
+        </div>
+    </div>
+
+    <script>
+        function testAction(action, data) {
+            const messageId = `${action}_${Date.now()}`;
+            console.log(`[Page 2] Testing ${action}`, data);
+            
+            window.postMessage({
+                type: 'TASKPILOT_ACTION',
+                messageId,
+                payload: { action, ...data }
+            }, '*');
+        }
+
+        function focusAndType() {
+            const input = document.getElementById('test-input-2');
+            input.focus();
+            setTimeout(() => {
+                testAction('type_text', { text: 'Hello from Page 2!' });
+            }, 200);
+        }
+
+        document.getElementById('page2-submit').addEventListener('click', () => {
+            alert('✅ Page 2 Submit Clicked!\n\nThe action system is working on this tab!');
+        });
+
+        // Log when this tab becomes visible
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                console.log('[Page 2] Tab became VISIBLE - border should appear');
+            } else {
+                console.log('[Page 2] Tab became HIDDEN - border should disappear');
+            }
+        });
+    </script>
+</body>
+</html>

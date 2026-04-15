@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Tab 3 - TaskPilot</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 40px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            color: #333;
+        }
+        .page-number {
+            font-size: 48px;
+            font-weight: bold;
+            color: #00f2fe;
+            margin: 20px 0;
+        }
+        h1 {
+            color: #4facfe;
+        }
+        .success-box {
+            background: #22c55e;
+            color: white;
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+            margin: 30px 0;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
+        }
+        button {
+            padding: 12px 24px;
+            background: #4facfe;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 5px;
+        }
+        button:hover {
+            background: #3a8cd9;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .test-card {
+            background: #f0f9ff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #4facfe;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-number">📄 Page 3</div>
+        <h1>Tab Switching Test - Page 3</h1>
+        
+        <div class="success-box">
+            🎉 GREAT! If the border is on THIS page,<br>
+            you've successfully tested multi-tab control!
+        </div>
+
+        <h2>✅ Feature Confirmation Checklist</h2>
+        
+        <div class="test-grid">
+            <div class="test-card">
+                <h4>✅ Border Follows</h4>
+                <p>Green border appears on active tab only</p>
+            </div>
+            <div class="test-card">
+                <h4>✅ Tab Switching</h4>
+                <p>Border moves when you switch tabs</p>
+            </div>
+            <div class="test-card">
+                <h4>✅ Actions Work</h4>
+                <p>Commands execute on visible tab</p>
+            </div>
+            <div class="test-card">
+                <h4>✅ Multi-Tab Control</h4>
+                <p>Can control any open tab by switching</p>
+            </div>
+        </div>
+
+        <h3>🎯 Final Tests</h3>
+        <p>If ALL these work, the implementation is complete:</p>
+        
+        <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <ol style="line-height: 2;">
+                <li>✅ Border appears on Tab 1 when you open it</li>
+                <li>✅ Border moves to Tab 2 when you switch to it</li>
+                <li>✅ Border moves to Tab 3 (this page) when active</li>
+                <li>✅ Scroll commands work on the current tab</li>
+                <li>✅ Click commands work on the current tab</li>
+                <li>✅ Type commands work on the current tab</li>
+                <li>✅ Gemini AI can see the current tab's content</li>
+                <li>✅ Border disappears from all tabs when sharing stops</li>
+            </ol>
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: center; margin: 30px 0;">
+            <button onclick="window.close()" style="background: #22c55e;">✅ All Tests Passed - Close</button>
+            <button onclick="location.href='test-tab-1.html'" style="background: #f59e0b;">🔄 Back to Tab 1</button>
+        </div>
+
+        <div style="height: 500px; background: linear-gradient(to bottom, #fff 0%, #f0f9ff 100%); padding: 20px; margin-top: 20px; border-radius: 8px;">
+            <h3>📝 Testing Summary - Page 3</h3>
+            <p><strong>What TaskPilot AI Can Now Do:</strong></p>
+            <ul>
+                <li>🎯 Control any browser tab during screen sharing</li>
+                <li>👀 Visual confirmation with green border on active tab</li>
+                <li>🔄 Seamlessly switch between tabs with border following</li>
+                <li>🗣️ Process voice commands on the visible tab</li>
+                <li>🤖 AI understands context from the active page</li>
+                <li>🔒 Security: Actions only work during screen sharing</li>
+                <li>⏱️ 500ms cooldown prevents accidental actions</li>
+                <li>🛑 Clean shutdown: All permissions cleared on stop</li>
+            </ul>
+            <br>
+            <p><strong>This matches Google Meet's behavior!</strong></p>
+            <p>The green indicator follows your active tab, just like screen sharing indicators in professional video conferencing tools.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                console.log('[Page 3] ✅ This tab is now ACTIVE - border should be here');
+            }
+        });
+    </script>
+</body>
+</html>

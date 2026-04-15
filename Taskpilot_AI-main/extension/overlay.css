@@ -1,0 +1,340 @@
+/**
+ * TaskPilot Screen Sharing Overlay
+ * Shows a persistent green border when screen sharing is active
+ * Provides clear visual indication of AI control
+ */
+
+#taskpilot-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    border: 6px solid #22c55e; /* Green-500 */
+    box-shadow: inset 0 0 30px rgba(34, 197, 94, 0.25),
+                0 0 20px rgba(34, 197, 94, 0.3);
+    pointer-events: none; /* Let clicks pass through */
+    z-index: 2147483647; /* Max z-index */
+    display: none; /* Hidden by default */
+    animation: taskpilot-pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+#taskpilot-overlay.taskpilot-avatar-only {
+    border: none;
+    box-shadow: none;
+    animation: none;
+    background: transparent;
+}
+
+#taskpilot-overlay.taskpilot-avatar-only::before,
+#taskpilot-overlay.taskpilot-avatar-only::after {
+    display: none;
+}
+
+#taskpilot-overlay.taskpilot-avatar-only #taskpilot-badge {
+    display: none;
+}
+
+#taskpilot-avatar {
+    position: absolute;
+    right: 24px;
+    bottom: 24px;
+    width: 128px;
+    height: 164px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+#taskpilot-avatar-shell {
+    position: relative;
+    width: 128px;
+    height: 164px;
+    border-radius: 46%;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 55%, #cbd5e1 100%);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    box-shadow: 0 18px 38px -18px rgba(15, 23, 42, 0.45), inset 0 -10px 10px rgba(148, 163, 184, 0.22), inset 0 4px 10px rgba(255, 255, 255, 0.95);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 36px;
+}
+
+#taskpilot-avatar-highlight {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 72px;
+    height: 34px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.88);
+    filter: blur(7px);
+    opacity: 0.82;
+}
+
+#taskpilot-avatar-face {
+    width: 78px;
+    height: 58px;
+    border-radius: 28px;
+    border: 3px solid #1e293b;
+    background: radial-gradient(circle at 70% 20%, rgba(56, 189, 248, 0.18), transparent 40%), #020617;
+    color: #22d3ee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: 2px;
+    position: relative;
+    text-shadow: 0 0 8px rgba(34, 211, 238, 0.85);
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.95);
+}
+
+#taskpilot-avatar-text {
+    position: relative;
+    z-index: 2;
+}
+
+#taskpilot-avatar-glow {
+    position: absolute;
+    inset: 0;
+    border-radius: 28px;
+    box-shadow: inset 0 0 16px rgba(34, 211, 238, 0.18);
+}
+
+#taskpilot-avatar-seam {
+    width: 100%;
+    height: 1px;
+    margin-top: 28px;
+    background: rgba(148, 163, 184, 0.4);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
+}
+
+#taskpilot-avatar-arm-left,
+#taskpilot-avatar-arm-right {
+    position: absolute;
+    top: 74px;
+    width: 22px;
+    height: 66px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+#taskpilot-avatar-arm-left {
+    left: -10px;
+    transform: rotate(-13deg);
+    background: linear-gradient(to right, #e2e8f0, #ffffff);
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+#taskpilot-avatar-arm-right {
+    right: -10px;
+    transform: rotate(13deg);
+    background: linear-gradient(to left, #e2e8f0, #ffffff);
+    box-shadow: -4px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+#taskpilot-avatar-pulse {
+    position: absolute;
+    inset: -10px;
+    border-radius: 999px;
+    border: 2px solid rgba(34, 197, 94, 0.25);
+    opacity: 0;
+}
+
+.taskpilot-avatar-hidden {
+    display: none !important;
+}
+
+.taskpilot-avatar-idle,
+.taskpilot-avatar-listening,
+.taskpilot-avatar-speaking {
+    display: flex !important;
+}
+
+.taskpilot-avatar-idle #taskpilot-avatar-face {
+    animation: taskpilot-avatar-float 2.4s ease-in-out infinite;
+}
+
+.taskpilot-avatar-listening #taskpilot-avatar-face {
+    animation: taskpilot-avatar-listen 1s ease-in-out infinite;
+}
+
+.taskpilot-avatar-listening #taskpilot-avatar-pulse {
+    animation: taskpilot-avatar-ripple 1.4s ease-out infinite;
+}
+
+.taskpilot-avatar-speaking #taskpilot-avatar-face {
+    animation: taskpilot-avatar-speak .32s ease-in-out infinite;
+}
+
+.taskpilot-avatar-speaking #taskpilot-avatar-shell {
+    animation: taskpilot-avatar-speak-shell .5s ease-in-out infinite;
+}
+
+.taskpilot-avatar-speaking #taskpilot-avatar-pulse {
+    animation: taskpilot-avatar-ripple .8s ease-out infinite;
+    border-color: rgba(56, 189, 248, 0.55);
+}
+
+@keyframes taskpilot-avatar-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
+}
+
+@keyframes taskpilot-avatar-listen {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+}
+
+@keyframes taskpilot-avatar-speak {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.06) rotate(1deg); }
+    50% { transform: scale(0.98) rotate(-1deg); }
+    75% { transform: scale(1.05) rotate(1deg); }
+}
+
+@keyframes taskpilot-avatar-ripple {
+    0% { transform: scale(0.92); opacity: 0.85; }
+    100% { transform: scale(1.24); opacity: 0; }
+}
+
+@keyframes taskpilot-avatar-speak-shell {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-1px); }
+}
+
+/* Subtle pulsing animation */
+@keyframes taskpilot-pulse {
+    0%, 100% { 
+        opacity: 1; 
+        border-color: #22c55e;
+    }
+    50% { 
+        opacity: 0.7;
+        border-color: #16a34a; /* Green-600 */
+    }
+}
+
+/* The badge label at the top */
+#taskpilot-badge {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    color: white;
+    padding: 8px 20px;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+    animation: taskpilot-badge-slide-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Slide-in animation for badge */
+@keyframes taskpilot-badge-slide-in {
+    from {
+        transform: translateX(-50%) translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Icon in badge */
+#taskpilot-badge-icon {
+    font-size: 16px;
+    animation: taskpilot-icon-spin 2s linear infinite;
+}
+
+@keyframes taskpilot-icon-spin {
+    0%, 90% { transform: rotate(0deg); }
+    95% { transform: rotate(15deg); }
+    100% { transform: rotate(0deg); }
+}
+
+/* Text in badge */
+#taskpilot-badge-text {
+    letter-spacing: 0.25px;
+}
+
+/* Make badge more prominent on hover (even though pointer-events: none on parent) */
+#taskpilot-badge:hover {
+    transform: translateX(-50%) scale(1.05);
+    transition: transform 0.2s ease;
+}
+
+/* Optional: Corners indicator for extra clarity */
+#taskpilot-overlay::before,
+#taskpilot-overlay::after {
+    content: '';
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border: 3px solid #22c55e;
+    pointer-events: none;
+}
+
+#taskpilot-overlay::before {
+    top: 12px;
+    left: 12px;
+    border-right: none;
+    border-bottom: none;
+    border-top-left-radius: 8px;
+}
+
+#taskpilot-overlay::after {
+    bottom: 12px;
+    right: 12px;
+    border-left: none;
+    border-top: none;
+    border-bottom-right-radius: 8px;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    #taskpilot-overlay {
+        border-width: 4px;
+    }
+    
+    #taskpilot-badge {
+        padding: 6px 16px;
+        font-size: 12px;
+    }
+    
+    #taskpilot-badge-icon {
+        font-size: 14px;
+    }
+
+    #taskpilot-avatar {
+        width: 108px;
+        height: 138px;
+        right: 16px;
+        bottom: 16px;
+    }
+
+    #taskpilot-avatar-shell {
+        width: 108px;
+        height: 138px;
+        padding-top: 30px;
+    }
+
+    #taskpilot-avatar-face {
+        width: 66px;
+        height: 50px;
+        font-size: 13px;
+    }
+}

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tab Switching Demo - TaskPilot</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            color: #333;
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .page-number {
+            font-size: 48px;
+            font-weight: bold;
+            color: #764ba2;
+            margin: 20px 0;
+        }
+        .instruction {
+            background: #f0f4ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+        .test-controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.2s, background 0.2s;
+        }
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        button.open-tab {
+            background: #22c55e;
+        }
+        button.open-tab:hover {
+            background: #16a34a;
+        }
+        .status-box {
+            background: white;
+            border: 2px solid #e5e7eb;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge.active {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .badge.inactive {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .scroll-area {
+            height: 600px;
+            background: linear-gradient(to bottom, #ffffff 0%, #f0f4ff 100%);
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow-y: auto;
+        }
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-number">📄 Page 1</div>
+        <h1>Tab Switching Test - TaskPilot AI</h1>
+        <p>This page demonstrates the green border following behavior when switching tabs.</p>
+
+        <div class="instruction">
+            <h3>🎯 How to Test:</h3>
+            <ol>
+                <li><strong>Start Screen Sharing</strong> - Click button below or use TaskPilot app</li>
+                <li><strong>Look for green border</strong> - Should appear on THIS page ✅</li>
+                <li><strong>Open Test Tab 2</strong> - Click the button to open another page</li>
+                <li><strong>Switch between tabs</strong> - Green border should FOLLOW the active tab</li>
+                <li><strong>Try voice commands</strong> - "Scroll down", "Type hello", "Click submit"</li>
+            </ol>
+        </div>
+
+        <div class="test-controls">
+            <button onclick="startSharing()">🟢 Start Screen Sharing</button>
+            <button onclick="stopSharing()">🔴 Stop Screen Sharing</button>
+            <button class="open-tab" onclick="openTestTab(2)">📄 Open Test Tab 2</button>
+            <button class="open-tab" onclick="openTestTab(3)">📄 Open Test Tab 3</button>
+        </div>
+
+        <div class="status-box">
+            <h3 style="margin-top: 0;">Status</h3>
+            <div class="status-item">
+                <span>Extension:</span>
+                <span id="status-extension" class="badge inactive">Checking...</span>
+            </div>
+            <div class="status-item">
+                <span>Screen Sharing:</span>
+                <span id="status-sharing" class="badge inactive">Not Active</span>
+            </div>
+            <div class="status-item">
+                <span>Green Border:</span>
+                <span id="status-border" class="badge inactive">Not Visible</span>
+            </div>
+            <div class="status-item">
+                <span>Current Tab:</span>
+                <span id="status-tab">Page 1</span>
+            </div>
+        </div>
+
+        <h3>Test Actions</h3>
+        <p>Try voice commands: <span class="highlight">"Scroll down"</span> | <span class="highlight">"Type hello world"</span> | <span class="highlight">"Click submit"</span></p>
+        
+        <div class="test-controls">
+            <button onclick="testScroll('down')">⬇️ Scroll Down</button>
+            <button onclick="testScroll('up')">⬆️ Scroll Up</button>
+            <button onclick="testType('Testing TaskPilot!')">⌨️ Type Text</button>
+        </div>
+
+        <input type="text" id="test-input" placeholder="Click here and try typing commands...">
+
+        <div class="scroll-area">
+            <h3>📜 Scrollable Content Area</h3>
+            <p>This area can be scrolled to test scroll commands.</p>
+            <p>Content Line 1 - The green border should be visible on whichever tab is active</p>
+            <p>Content Line 2 - When you switch tabs, the border follows to the new tab</p>
+            <p>Content Line 3 - This mimics Google Meet's screen sharing indicator</p>
+            <p>Content Line 4 - The border ensures you know which screen is being controlled</p>
+            <p>Content Line 5 - Actions like scrolling work on the currently active tab</p>
+            <p>Content Line 6 - You can switch tabs and give commands to the new tab</p>
+            <p>Content Line 7 - The AI responds to the content on the visible tab</p>
+            <p>Content Line 8 - This is the expected behavior</p>
+            <p>Content Line 9 - Test by opening multiple tabs and switching between them</p>
+            <p>Content Line 10 - Each tab will show the border when it becomes active</p>
+            <br><br>
+            <button id="submit-btn" style="width: auto;">Submit Button (Click Test)</button>
+        </div>
+    </div>
+
+    <script>
+        // Check extension on load
+        setTimeout(() => {
+            const overlay = document.getElementById('taskpilot-overlay');
+            const statusExt = document.getElementById('status-extension');
+            
+            if (overlay) {
+                statusExt.textContent = '✅ Loaded';
+                statusExt.className = 'badge active';
+                console.log('[Demo] Extension detected');
+            } else {
+                statusExt.textContent = '❌ Not Found';
+                statusExt.className = 'badge inactive';
+                console.log('[Demo] Extension NOT detected - please install');
+            }
+        }, 500);
+
+        // Monitor border visibility
+        setInterval(() => {
+            const overlay = document.getElementById('taskpilot-overlay');
+            const statusBorder = document.getElementById('status-border');
+            
+            if (overlay && overlay.style.display === 'block') {
+                statusBorder.textContent = '✅ Visible';
+                statusBorder.className = 'badge active';
+            } else {
+                statusBorder.textContent = '❌ Hidden';
+                statusBorder.className = 'badge inactive';
+            }
+        }, 500);
+
+        // Listen for visibility changes (when tab becomes active/inactive)
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                console.log('[Demo] Tab became visible - border should appear');
+            } else {
+                console.log('[Demo] Tab became hidden - border should disappear');
+            }
+        });
+
+        function startSharing() {
+            console.log('[Demo] Triggering START_SHARING');
+            window.postMessage({ 
+                type: 'START_SHARING', 
+                mode: 'entire-screen',
+                source: 'taskpilot-webapp'
+            }, '*');
+            
+            document.getElementById('status-sharing').textContent = '✅ Active';
+            document.getElementById('status-sharing').className = 'badge active';
+            
+            setTimeout(() => {
+                const overlay = document.getElementById('taskpilot-overlay');
+                if (overlay && overlay.style.display === 'block') {
+                    alert('✅ Success! Green border is now visible.\n\nNow try:\n1. Open Tab 2\n2. Switch between tabs\n3. Watch the border follow!');
+                } else {
+                    alert('⚠️ Border not visible yet.\n\nMake sure:\n1. Extension is installed\n2. Page is refreshed\n3. Check console for errors');
+                }
+            }, 1000);
+        }
+
+        function stopSharing() {
+            console.log('[Demo] Triggering STOP_SHARING');
+            window.postMessage({ 
+                type: 'STOP_SHARING',
+                source: 'taskpilot-webapp'
+            }, '*');
+            
+            document.getElementById('status-sharing').textContent = '❌ Stopped';
+            document.getElementById('status-sharing').className = 'badge inactive';
+        }
+
+        function openTestTab(pageNum) {
+            const url = `test-tab-${pageNum}.html`;
+            window.open(url, '_blank');
+        }
+
+        function testScroll(direction) {
+            window.postMessage({
+                type: 'TASKPILOT_ACTION',
+                messageId: `scroll_${Date.now()}`,
+                payload: { action: 'scroll', direction, amount: 300 }
+            }, '*');
+        }
+
+        function testType(text) {
+            document.getElementById('test-input').focus();
+            setTimeout(() => {
+                window.postMessage({
+                    type: 'TASKPILOT_ACTION',
+                    messageId: `type_${Date.now()}`,
+                    payload: { action: 'type_text', text }
+                }, '*');
+            }, 100);
+        }
+
+        document.getElementById('submit-btn').addEventListener('click', () => {
+            alert('✅ Submit button clicked!\n\nTry voice command: "Click submit"');
+        });
+    </script>
+</body>
+</html>
